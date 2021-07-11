@@ -3,6 +3,8 @@ import { Route } from "react-router-dom";
 import { CSSTransition } from "react-transition-group";
 import { gsap } from "gsap";
 import "./App.scss";
+import "primereact/resources/themes/saga-blue/theme.css"
+import "primereact/resources/primereact.min.css"
 
 import About from "./pages/about";
 import Header from "./components/header";
@@ -14,6 +16,7 @@ const routes = [
 ];
 
 function App() {
+  
   const onEnter = node => {
     gsap.from(
       [node.children[0].firstElementChild, node.children[0].lastElementChild],
@@ -48,6 +51,7 @@ function App() {
     <>
       <Header />
       <div className='container'>
+       
         {routes.map(({ path, Component }) => (
           <Route key={path} exact path={path}>
             {({ match }) => (
