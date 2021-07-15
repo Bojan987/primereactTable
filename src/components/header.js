@@ -22,6 +22,15 @@ const Header = () => {
         }}>
         About
       </NavLink>
+      <NavLink
+        to='/login'
+        exact
+        activeStyle={{
+          fontWeight: "bold",
+          color: "red"
+        }}>
+        Login
+      </NavLink>
     </div>
   );
 };

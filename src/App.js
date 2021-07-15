@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Route } from "react-router-dom";
+import { Route, Switch, useHistory, useLocation, useRouteMatch } from "react-router-dom";
 import { CSSTransition } from "react-transition-group";
 import { gsap } from "gsap";
 import "./App.scss";
@@ -12,11 +12,16 @@ import Home from "./pages/home";
 
 const routes = [
   { path: "/", name: "Home", Component: Home },
-  { path: "/about", name: "About", Component: About }
+  { path: "/about", name: "About", Component: About },
+  { path: "/login", name: "Login", Component: About }
 ];
 
 function App() {
-  
+  const history = useHistory()
+  const location1 =useLocation()
+  console.log(location1,history)
+  const match = useRouteMatch('/login')
+  console.log(match)
   const onEnter = node => {
     gsap.from(
       [node.children[0].firstElementChild, node.children[0].lastElementChild],
@@ -49,9 +54,10 @@ function App() {
 
   return (
     <>
-      <Header />
-      <div className='container'>
-       
+     {!match && <Header />}
+              <div className='container'>
+       <Switch>
+
         {routes.map(({ path, Component }) => (
           <Route key={path} exact path={path}>
             {({ match }) => (
@@ -59,7 +65,7 @@ function App() {
                 in={match != null}
                 timeout={1200}
                 classNames='page'
-                onExit={onExit}
+                onExit={onExit} 
                 onEntering={onEnter}
                 unmountOnExit>
                 <div className='page'>
@@ -69,6 +75,7 @@ function App() {
             )}
           </Route>
         ))}
+       </Switch>
       </div>
     </>
   );

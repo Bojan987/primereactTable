@@ -7,6 +7,11 @@ import { Button } from "primereact/button";
 import { FileUpload } from "primereact/fileupload";
 import { Tooltip } from "primereact/tooltip";
 import { Toast } from "primereact/toast";
+import ReactExport from 'react-data-export';
+
+const ExcelFile = ReactExport.ExcelFile;
+const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
+
 const Home = () => {
   const [products, setProducts] = useState([]);
   const [columns, setColumns] = useState([]);
@@ -20,13 +25,13 @@ const Home = () => {
   const dt = useRef(null);
   const toast = useRef(null);
   const [colsReordered, setColsReordered] = useState([
-    { field: "code", header: "Code", order: 0 },
-    { field: "name", header: "Name", order: 1 },
-    { field: "category", header: "Category", order: 2 },
-    { field: "quantity", header: "Quantity", order: 3 },
-    { field: "id", header: "ID", order: 4 },
-    { field: "description", header: "Description", order: 5 },
-    { field: "bojan", header: "Bojan", order: 6 },
+    { field: "code", header: "Code", width: 0 },
+    { field: "name", header: "Name", width: 1 },
+    { field: "category", header: "Category", width: 2 },
+    { field: "quantity", header: "Quantity", width: 3 },
+    { field: "id", header: "ID", width: 4 },
+    { field: "description", header: "Description", width: 5 },
+    { field: "bojan", header: "Bojan", width: 6 },
   ]);
 
   const cols = [
@@ -36,22 +41,51 @@ const Home = () => {
     { field: "quantity", header: "Quantity", order: 3 },
   ];
 
+  // 00cc00 0066cc ebc907
+
+  const DataSet = [
+    {
+        columns: [
+            {title: "ID", style: {font: {sz: "18", bold: true}}, width: {wpx: 125}}, // width in pixels
+            {title: "Name", style: {font: {sz: "18", bold: true}}, width: {wch: 50}}, // width in characters
+            {title: "Description", style: {font: {sz: "18", bold: true}}, width: {wpx: 100}}, // width in pixels
+            {title: "Category", style: {font: {sz: "18", bold: true}}, width: {wpx: 125}}, // width in pixels
+            {title: "Price", style: {font: {sz: "18", bold: true}}, width: {wpx: 100}}, // width in pixels
+            {title: "Bojan", style: {font: {sz: "18", bold: true}}, width: {wpx: 125}}, // width in pixels
+         
+            
+        ],
+        data: products.map((data) => [
+            {value: data.id, style: {font: {sz: "14"},fill: {patternType: "solid", fgColor: {rgb: data.category ==='Accessories' ? '00cc00': data.category ==='Fitness' ? '0066cc' :'ebc907'}}}},
+            {value: data.name, style: {font: {sz: "14"},fill: {patternType: "solid", fgColor: {rgb: data.category ==='Accessories' ? '00cc00': data.category ==='Fitness' ? '0066cc' :'ebc907'}}}},
+            {value: data.description, style:{font: {color: {rgb: "ffffff"}}, fill: {patternType: "solid", fgColor: {rgb: data.category ==='Accessories' ? '00cc00': data.category ==='Fitness' ? '0066cc' :'ebc907'}}}},
+            {value: data.category, style:{font: {color: {rgb: "ffffff"}}, fill: {patternType: "solid", fgColor: {rgb: data.category ==='Accessories' ? '00cc00': data.category ==='Fitness' ? '0066cc' :'ebc907'}}}},
+            {value: data.price, style:{font: {color: {rgb: "ffffff"}}, fill: {patternType: "solid", fgColor: {rgb: data.category ==='Accessories' ? '00cc00': data.category ==='Fitness' ? '0066cc' :'ebc907'}}}},
+            {value: data.bojan ? data.bojan : '', style:{font: {color: {rgb: "ffffff"}}, fill: {patternType: "solid", fgColor: {rgb: data.category ==='Accessories' ? '00cc00': data.category ==='Fitness' ? '0066cc' :'ebc907'}}}},
+           
+        ])
+    }
+]
   useEffect(() => {
     setProducts(data.data);
     setColumns((previous) => {});
   }, []);
-
+  const resize = (e) => {
+    console.log(e);
+    console.log(e.column);
+  };
   const resizer = (e) => {
-    console.log(e.columns);
+    console.log(e);
     const currentColumns = e.columns;
-    const { dropIndex, dragIndex } = e;
-    console.log(dropIndex, dragIndex);
+   
+   
 
     const reorderedColumns = currentColumns.reduce(
       (accumulator, currentColumn) => {
         const columnAdd = {
           field: currentColumn.props.field,
           header: currentColumn.props.header,
+          width:currentColumn.props.style.width
         };
         accumulator.push(columnAdd);
         return accumulator;
@@ -98,19 +132,20 @@ const Home = () => {
   };
 
   const importExcel = (e) => {
-    const file = e.files[0];
+    const file = e.target.files[0];
 
     import("xlsx").then((xlsx) => {
       const reader = new FileReader();
+
       reader.onload = (e) => {
         const wb = xlsx.read(e.target.result, { type: "array" });
         const wsname = wb.SheetNames[0];
         const ws = wb.Sheets[wsname];
         const data = xlsx.utils.sheet_to_json(ws, { header: 1 });
-
+        console.log(data);
         // Prepare DataTable
         const cols = data[0];
-        console.log(cols);
+
         data.shift();
 
         let _importedCols = cols.map((col) => ({
@@ -119,7 +154,6 @@ const Home = () => {
         }));
         let _importedData = data.map((d) => {
           return cols.reduce((obj, c, i) => {
-            console.log(`D je:${d},OBJ JE : ${obj},C JE :${c},I JE ${i}`);
             obj[c.replace(/\s/g, "")] = d[i];
             return obj;
           }, {});
@@ -229,6 +263,13 @@ const Home = () => {
         className="p-button-info p-ml-auto"
         data-pr-tooltip="Selection Only"
       />
+       {products.length !== 0 ? (
+                         <ExcelFile 
+                         filename="Covid-19 Data" 
+                         element={<Button type="button" className="p-button-info p-ml-auto" icon="pi pi-filter">Export Data</Button>}>
+                             <ExcelSheet dataSet={DataSet} name="Covid-19 Country Report"/>
+                         </ExcelFile>
+                    ): null}      
     </div>
   );
 
@@ -252,6 +293,13 @@ const Home = () => {
           <Toast ref={toast} />
 
           <div className="p-d-flex p-ai-center p-py-2">
+            <input
+              type="file"
+              icon="pi pi-filter"
+              onChange={importExcel}
+              className="p-button-info p-ml-auto"
+              data-pr-tooltip="Selection Only"
+            />
             <FileUpload
               chooseOptions={{ label: "CSV", icon: "pi pi-file-o" }}
               mode="basic"
@@ -326,7 +374,7 @@ const Home = () => {
             resizableColumns
             columnResizeMode="fit"
             showGridlines
-            onColumnResizeEnd={resizer}
+            onColumnResizeEnd={resize}
             reorderableColumns
             onColReorder={resizer}
           >
@@ -338,7 +386,7 @@ const Home = () => {
                     <Column field="description" header="Description" style={{width:'20%'}}/>
                     <Column field="bojan" header="Bojan" style={{width:'20%'}}/> */}
             {colsReordered.map((col, index) => (
-              <Column key={index} field={col.field} header={col.header} />
+              <Column key={index} field={col.field} header={col.header}  />
             ))}
           </DataTable>
         </div>

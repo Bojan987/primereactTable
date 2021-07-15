@@ -14,6 +14,7 @@
     "node-sass": "^4.13.0",
     "primereact": "^6.5.0-rc.2",
     "react": "^16.11.0",
+    "react-data-export": "^0.6.0",
     "react-dom": "^16.11.0",
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.2.0",
