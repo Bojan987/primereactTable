@@ -9,11 +9,12 @@ import "primereact/resources/primereact.min.css"
 import About from "./pages/about";
 import Header from "./components/header";
 import Home from "./pages/home";
+import Login from "./pages/login"
 
 const routes = [
   { path: "/", name: "Home", Component: Home },
   { path: "/about", name: "About", Component: About },
-  { path: "/login", name: "Login", Component: About }
+  { path: "/login", name: "Login", Component: Login }
 ];
 
 function App() {
